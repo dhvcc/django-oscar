@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.utils.encoding import smart_str
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from django.views.generic.base import View
 
 from oscar.core.utils import safe_referrer
@@ -52,7 +52,7 @@ class BulkEditMixin(object):
     def get_checkbox_object_name(self):
         if self.checkbox_object_name:
             return self.checkbox_object_name
-        return smart_str(self.model._meta.object_name.lower())
+        return smart_str(self.model._meta.verbose_name_plural.lower())
 
     def get_error_url(self, request):
         return safe_referrer(request, '.')
@@ -75,8 +75,8 @@ class BulkEditMixin(object):
         if not ids:
             messages.error(
                 self.request,
-                _("You need to select some %ss")
-                % self.get_checkbox_object_name())
+                _("You need to select some %s")  # custom
+                % pgettext_lazy("couple of", self.get_checkbox_object_name()))
             return redirect(self.get_error_url(request))
 
         objects = self.get_objects(ids)
